@@ -1,0 +1,8 @@
+node_modules/
+package-lock.json
+gcloud_build_image
+.gcloudignore
+keyfile.json
+index.yaml
+openapi-functions.yaml
+ifDataGet/config.json

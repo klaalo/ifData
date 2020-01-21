@@ -1,0 +1,7 @@
+{
+	"dependencies": {
+		"net-snmp": "^1.2.4",
+		"@google-cloud/datastore": "^4.1.4",
+		"moment": "^2.24.0"
+	}
+}
