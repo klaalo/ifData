@@ -45,7 +45,7 @@ Implementation relies on following services and devices. List may be incomplete:
 * [Node.js 10](https://nodejs.org/)
 * [Chart.js](https://www.chartjs.org)
 
-![Architecture layout illustration](ifDataArch.svg?raw=true)
+![Architecture layout illustration](ifDataArch.svg?sanitize=true)
 
 
 ## Deploy
