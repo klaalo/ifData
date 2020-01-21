@@ -17,7 +17,7 @@
     "hrSystemDate" :"1.3.6.1.2.1.25.1.2.0"
   },
   "gcp": {
-    "projectId": "klaalo-1162",
+    "projectId": "project-1234",
     "keyFilename": "../keyfile.json",
     "kind": "ifCounterdata",
     "sumDayKind": "ifDaySummary"
