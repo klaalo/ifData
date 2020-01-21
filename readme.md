@@ -27,7 +27,7 @@ To get around CORS requirements, Google Cloud Endpoints [Extensible Server proxy
 
 The authentication information about the user is relayed to the function using OIDC ID Token that is received from the Google Sing-In OpenID Connect Provider. Short-lived ID Token is sufficient as it is needed only at the time the chart data is fetched. It is supposed that Google Sign-In client libraries handle refreshing of the ID Token when necessary.
 
-This makes very inexpensive compination of services as the container reserves computing instances only when used. In single user scenario, the container instance is spawned only so often.
+This makes very inexpensive combination of services as the container reserves computing instances only when used. In single user scenario, the container instance is spawned only so often.
 
 ## Data visualisation
 
