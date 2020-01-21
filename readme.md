@@ -7,7 +7,7 @@ This is yet another hobby project to play with serverless implementations. The p
 | ------ | -------- | ------- |
 | ifDataGet | Google Cloud Functions | Retrieve metrics from Google Datastore and output as json array to be displayed as chart on a web page |
 | ifDataPut | Raspberry Pi | Retrieve sensor metics and store them in Google Cloud Datastore. Also periodically calculate daily summaries from old data to reduce stored entries. |
-| static html | Google Cloud Storage | Hosting of the static web page html code that is used to render the data visualisation |
+| static html | Google Cloud Storage | Hosting of the static web page html code that is used to render the data visualisation. |
 
 Original inspiration was to fetch and store temperature and other environmental data collected from [RuuviTag](https://ruuvi.com). In absence of RuuviTag, interface counter data was used instead as those were easily available from [ER-X](https://www.ui.com/edgemax/edgerouter-x/).
 
