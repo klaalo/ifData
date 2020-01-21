@@ -54,4 +54,4 @@ Deploy ifDataGet function to cloud:
 
     gcloud functions deploy ifDataGet --runtime nodejs10 --update-env-vars A_USER=12345 --trigger-http --memory 128MB --region europe-west1
 
-ESP deployment to the Cloud Run container (_beta_) is somewhat more complex. Please refer to [https://cloud.google.com/endpoints/docs/openapi/get-started-cloud-run](tutorial).
+ESP deployment to the Cloud Run container (_beta_) is somewhat more complex. Please refer to [tutorial](https://cloud.google.com/endpoints/docs/openapi/get-started-cloud-run).
