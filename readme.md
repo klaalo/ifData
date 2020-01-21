@@ -45,7 +45,7 @@ Implementation relies on following services and devices. List may be incomplete:
 * [Node.js 10](https://nodejs.org/)
 * [Chart.js](https://www.chartjs.org)
 
-[[https://github.com/klaalo/ifData/blob/master/ifDataArch.svg|alt=Architecture layout illustration]]
+![Architecture layout illustration](ifDataArch.svg?raw=true)
 
 
 ## Deploy
