@@ -48,7 +48,7 @@ exports.countData = (entities) => {
 
 exports.divided = (entities) => {
   var data = new Array();
-  while (entities.length > 1) {
+  while (entities.length > 0) {
     var ent = entities.shift();
     data.push({
       date: ent.date,
