@@ -56,10 +56,9 @@ function summariseDay(tMoment, entity) {
 function deleteKeys(keys) {
   datastore.delete((keys), (err) => {
       if (err) {
-        console.log(err);
+          console.log({ 'datastore error' : err});
       } else {
-        console.log('Deleted ' + keys.length +
-          ' entities');
+          console.log({ 'Deleted entities count' : keys.length });
       }
   });
 
