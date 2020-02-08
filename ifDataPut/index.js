@@ -55,4 +55,5 @@ function save(data) {
 process.on('exit', (code) => {
   console.log('exit code:' + code);
   sigterm = true;
+  process.exit();
 });

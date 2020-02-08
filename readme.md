@@ -55,3 +55,8 @@ Deploy ifDataGet function to cloud:
     gcloud functions deploy ifDataGet --runtime nodejs10 --update-env-vars A_USER=12345 --trigger-http --memory 128MB --region europe-west1
 
 ESP deployment to the Cloud Run container (_beta_) is somewhat more complex. Please refer to [tutorial](https://cloud.google.com/endpoints/docs/openapi/get-started-cloud-run).
+
+## Run in Docker
+
+    docker build -t ifdata .
+    docker run -dv '/opt/ifData/ifDataLogs/:/opt/ifData/logs/'  --name ifdata ifdata
