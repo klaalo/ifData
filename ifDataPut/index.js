@@ -43,7 +43,7 @@ function save(data) {
   }
   datastore.save(entity, (err, keys) => {
       if (err) {
-        return console.log('Datastore error | ' + err);
+          return console.log({ 'Datastore error' : err});
       }
       console.log({
         date: new(Date),
@@ -52,8 +52,16 @@ function save(data) {
   });
 }
 
-process.on('exit', (code) => {
-  console.log('exit code:' + code);
-  sigterm = true;
-  process.exit();
+function exitMe(code) {
+    console.log({ 'exit code':  code });
+    sigterm = true;
+    process.exit();
+}
+
+process.on('SIGINT', () => {
+    exitMe('SIGINT');
+});
+
+process.on('SIGTERM', () => {
+    exitMe('SIGTERM');
 });
