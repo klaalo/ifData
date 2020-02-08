@@ -31,8 +31,8 @@ function summariseDay(tMoment, entity) {
         secs: 0
       };
       countedData.data.forEach((element) => {
-        summarised.in += element.in;
-        summarised.out += element.out;
+        summarised.in += element.inOctets;
+        summarised.out += element.outOctets;
         summarised.secs += element.secs;
       });
       summarised.date = tMoment.format();
