@@ -59,7 +59,8 @@ exports.ifDataGet = (req, res) => {
         res.status(401).send('Unauthorised user.');
         return;
     }
-  } else if (!req.query.gran) {
+  } else if (!(req.query.gran
+    || req.query.dataType)) {
       res.status(400).send('Bad request');
       return;
   }
@@ -70,22 +71,35 @@ exports.ifDataGet = (req, res) => {
       return;
       break;
     case 'GET':
-      if (req.query.out == 'chart') {
-        get(req.query.gran)
-          .then((data) => {
-            res.send(formResponse(data));
-          })
-          .catch((responseStr) => {
-            res.send(responseStr);
-          });
+
+      if (req.query.dataType &&
+        req.query.dataType == "tagSingle") {
+          getTagdata(1)
+            .then((data) => {
+              res.send(data[0]);
+            })
+            .catch((responseStr) => {
+              res.status(500).send(responseStr);
+            });
       } else {
-        get(req.query.gran)
-          .then((data) => {
-            res.send(data);
-          })
-          .catch((responseStr) => {
-            res.send(responseStr);
-          });
+
+        if (req.query.out == 'chart') {
+          get(req.query.gran)
+            .then((data) => {
+              res.send(formResponse(data));
+            })
+            .catch((responseStr) => {
+              res.send(responseStr);
+            });
+        } else {
+          get(req.query.gran)
+            .then((data) => {
+              res.send(data);
+            })
+            .catch((responseStr) => {
+              res.send(responseStr);
+            });
+        }
       }
       break;
     default:
@@ -94,6 +108,24 @@ exports.ifDataGet = (req, res) => {
 
 };
 
+
+function getTagdata(limit) {
+  return new Promise((resolve, reject) => {
+    let query = datastore.createQuery(config.temp.kind);
+    query
+      .order('fDate', {
+        descending: true
+      })
+      .limit(limit)
+      .run((err, entities) => {
+        if (err) {
+          console.log({ error: 'datastore error'});
+          reject('datastore error');
+        }
+        resolve(entities);
+      });
+  });
+};
 
 function get(gran) {
 
@@ -151,6 +183,7 @@ function formResponse(data) {
 }
 
 function isAllowed(req) {
+  if (req.query.dataType && req.query.dataType == 'tagSingle') return true;
   if (!req.get('X-Endpoint-API-UserInfo')) return false;
   var jwt = JSON.parse(Base64.decode(req.get('X-Endpoint-API-UserInfo')));
   return jwt.sub == process.env.A_USER ? true : false;
