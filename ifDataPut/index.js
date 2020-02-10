@@ -89,15 +89,18 @@ function saveTagdata(data) {
 
 ruuvi.on('found', tag => {
 
+    var tagId = tag.id;
     tag.on('updated', (data) => {
 	if (lastRuuviUpdate &&
             lastRuuviUpdate instanceof moment &&
             lastRuuviUpdate.isBefore(
 		moment().subtract(config.temp.sampleIntervalMin, 'minutes'))) {
 
+	    data.tagId = tagId;
 	    saveTagdata(data);
 
 	} else if (!lastRuuviUpdate) {
+	    data.tagId = tagId;
 	    saveTagdata(data);
 	}
 
