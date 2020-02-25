@@ -23,8 +23,8 @@
     "sumDayKind": "ifDaySummary"
   },
   "temp": {
-    "sampleIntervalMin":"5",
+    "sampleIntervalMin":"15",
     "kind": "ruuvitagSample",
-    "getLimit": 1440
+    "getLimit": 480
   }
 }
