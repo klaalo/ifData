@@ -81,25 +81,33 @@ exports.ifDataGet = (req, res) => {
             .catch((responseStr) => {
               res.status(500).send(responseStr);
             });
+      } else if (req.query.dataType &&
+        req.query.dataType == "tagMultiple") {
+          getTagdata(config.temp.getLimit)
+            .then((data) => {
+              if (req.query.out &&
+                req.query.out == 'chart') {
+                    res.send(formTagResponse(data));
+                } else {
+                    res.send(data);
+                }
+            })
+            .catch((responseStr) => {
+              res.status(500).send(responseStr);
+            });
       } else {
-
-        if (req.query.out == 'chart') {
-          get(req.query.gran)
-            .then((data) => {
-              res.send(formResponse(data));
-            })
-            .catch((responseStr) => {
-              res.send(responseStr);
-            });
-        } else {
-          get(req.query.gran)
-            .then((data) => {
-              res.send(data);
-            })
-            .catch((responseStr) => {
-              res.send(responseStr);
-            });
-        }
+        get(req.query.gran)
+          .then((data) => {
+            if (req.query.out &&
+              req.query.out == 'chart') {
+                res.send(formResponse(data));
+              } else {
+                res.send(data);
+              }
+          })
+          .catch((responseStr) => {
+            res.send(responseStr);
+          });
       }
       break;
     default:
@@ -167,19 +175,54 @@ function formResponse(data) {
   var inData = new Array();
   var outData = new Array();
   var labels = new Array();
-    data.forEach((element) => {
-      var date = moment(element.date).format('LLL');
-      inData.push({
-        x: date,
-        y: element.in
-      });
-      outData.push({
-        x: date,
-        y: element.out
-      });
-      labels.push(date);
+  data.forEach((element) => {
+    var date = moment(element.date).format('LLL');
+    inData.push({
+      x: date,
+      y: element.in
     });
-    return { labels: labels, inData: inData, outData: outData };
+    outData.push({
+      x: date,
+      y: element.out
+    });
+    labels.push(date);
+  });
+  return { labels: labels, inData: inData, outData: outData };
+}
+
+function formTagResponse(data) {
+  var tempData = new Array();
+  var humidityData = new Array();
+  var pressureData = new Array();
+  var batteryData = new Array();
+  var labels = new Array();
+  data.forEach((element) => {
+    var date = moment(element.fDate).format('LLL');
+    tempData.push({
+      x: date,
+      y: element.temperature
+    });
+    humidityData.push({
+      x: date,
+      y: element.humidity
+    });
+    pressureData.push({
+      x: date,
+      y: element.pressure / 100
+    });
+    batteryData.push({
+      x: date,
+      y: element.battery
+    });
+    labels.push(date);
+  });
+  return {
+    labels: labels,
+    tempData: tempData,
+    humidityData: humidityData,
+    pressureData: pressureData,
+    batteryData: batteryData
+  };
 }
 
 function isAllowed(req) {
