@@ -26,5 +26,8 @@
     "sampleIntervalMin":"15",
     "kind": "ruuvitagSample",
     "getLimit": 480
+  },
+  "tagSocket": {
+    "port":"8787"
   }
 }

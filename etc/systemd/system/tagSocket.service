@@ -1,0 +1,20 @@
+[Unit]
+Description=tagSocket server
+
+
+[Service]
+ExecStart=/usr/bin/node /opt/ifData/tagSocket/index.js
+#WorkingDirectory=/opt/ifData/ifDataPut
+Restart=always
+# Restart service after 10 seconds if node service crashes
+RestartSec=40
+# Output to syslog
+#StandardOutput=syslog
+#StandardError=syslog
+#SyslogIdentifier=tagSocket
+User=pi
+Group=pi
+Environment=NODE_ENV=production PORT=1337
+
+[Install]
+WantedBy=multi-user.target
