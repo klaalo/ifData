@@ -2,7 +2,8 @@ const config = require('../config.json');
 const counterdata = require("./counterData.js");
 const moment = require('moment');
 
-const ruuvi = require('node-ruuvitag');
+const io = require('socket.io-client');
+const socket = io.connect(config.temp.socketHost);
 
 const {Datastore} = require('@google-cloud/datastore');
 const datastore = new Datastore({
@@ -86,25 +87,23 @@ function saveTagdata(data) {
     lastRuuviUpdate = moment();
 }
 
+socket.on('connect_error', (error) => {
+  exitMe({ 'socket connect_error': error});
+})
 
-ruuvi.on('found', tag => {
+socket.on('disconnect', (reason) => {
+  exitMe('socket ' + reason);
+});
 
-    var tagId = tag.id;
-    tag.on('updated', (data) => {
-	if (lastRuuviUpdate &&
+socket.on('updated', (data) => {
+  if (lastRuuviUpdate &&
             lastRuuviUpdate instanceof moment &&
             lastRuuviUpdate.isBefore(
 		moment().subtract(config.temp.sampleIntervalMin, 'minutes'))) {
 
-	    data.tagId = tagId;
 	    saveTagdata(data);
 
 	} else if (!lastRuuviUpdate) {
-	    data.tagId = tagId;
 	    saveTagdata(data);
 	}
-
-    });
-
 });
-

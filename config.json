@@ -25,7 +25,8 @@
   "temp": {
     "sampleIntervalMin":"15",
     "kind": "ruuvitagSample",
-    "getLimit": 480
+    "getLimit": 480,
+    "socketHost": "http://raspberrypi.local:8787"
   },
   "tagSocket": {
     "port":"8787"

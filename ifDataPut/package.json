@@ -3,6 +3,6 @@
 		"net-snmp": "^1.2.4",
 		"@google-cloud/datastore": "^4.1.4",
 		"moment": "^2.24.0",
-		"node-ruuvitag": "^4.2.0"
+		"socket.io-client": "^2.3.0"
 	}
 }
