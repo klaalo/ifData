@@ -3,7 +3,7 @@ Description=ifDataPut server
 
 
 [Service]
-ExecStart=/usr/local/bin/node /opt/ifData/ifDataPut/index.js
+ExecStart=/usr/bin/node /opt/ifData/ifDataPut/index.js
 # Required on some systems
 WorkingDirectory=/opt/ifData/ifDataPut
 Restart=always
