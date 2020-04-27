@@ -26,7 +26,8 @@
     "sampleIntervalMin":"15",
     "kind": "ruuvitagSample",
     "getLimit": 480,
-    "socketHost": "http://raspberrypi.local:8787"
+    "socketHost": "http://raspberrypi.local:8787",
+    "reducedDayKind": "ruuvitagDayReduced"
   },
   "tagSocket": {
     "port":"8787"

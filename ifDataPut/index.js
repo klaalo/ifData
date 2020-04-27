@@ -12,6 +12,7 @@ const datastore = new Datastore({
 });
 
 const summariser = require('./summariser.js');
+const reducer = require('./reducer.js');
 
 var sigterm = false;
 var lastRun = new Date(0);
@@ -22,6 +23,8 @@ get();
 setInterval(get, config.general.intervalMin * 60000);
 summariser.run();
 setInterval(summariser.run, config.general.summariserHours * 3600 * 1000);
+reducer.run();
+setInterval(reducer.run, config.general.summariserHours * 3600 * 1000);
 
 function get() {
   if (sigterm) { return; };
