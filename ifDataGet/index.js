@@ -83,11 +83,15 @@ exports.ifDataGet = (req, res) => {
             });
       } else if (req.query.dataType &&
         req.query.dataType == "tagMultiple") {
-          getTagdata(config.temp.getLimit)
+          getTagdata(config.temp.getLimit, req.query.gran)
             .then((data) => {
               if (req.query.out &&
                 req.query.out == 'chart') {
+                  if (req.query.gran == 'daily') {
+                    res.send(formReducedTagResponse(data));
+                  } else {
                     res.send(formTagResponse(data));
+                  }
                 } else {
                     res.send(data);
                 }
@@ -117,14 +121,33 @@ exports.ifDataGet = (req, res) => {
 };
 
 
-function getTagdata(limit) {
+function getTagdata(limit, gran) {
+
+  var myGran = "";
+  switch (gran) {
+    case 'daily':
+      myGran = config.temp.reducedDayKind;
+      break;
+    default:
+      myGran = config.temp.kind;
+      break;
+  }
+
   return new Promise((resolve, reject) => {
-    let query = datastore.createQuery(config.temp.kind);
+
+    var myLimit;
+    if (limit != 1) {
+      myLimit = (myGran == config.temp.kind) ?
+        config.temp.getLimit :
+        config.general.getDaysLimit;
+    }
+
+    let query = datastore.createQuery(myGran);
     query
       .order('fDate', {
         descending: true
       })
-      .limit(limit)
+      .limit(myLimit)
       .run((err, entities) => {
         if (err) {
           console.log({ error: 'datastore error'});
@@ -223,6 +246,38 @@ function formTagResponse(data) {
     pressureData: pressureData,
     batteryData: batteryData
   };
+}
+
+function formReducedTagResponse(data) {
+  var tempData = new Array();
+  var humidityData = new Array();
+  var pressureData = new Array();
+  var batteryData = new Array();
+  var labels = new Array();
+  data.forEach((element) => {
+    var date = moment(element.fDate).format('LLL');
+    tempData.push({
+      x: date,
+      y: element.temperatureAvg
+    });
+    humidityData.push({
+      x: date,
+      y: element.humidityAvg
+    });
+    pressureData.push({
+      x: date,
+      y: element.pressureAvg / 100
+    });
+    labels.push(date);
+  });
+  return {
+    labels: labels,
+    tempData: tempData,
+    humidityData: humidityData,
+    pressureData: pressureData,
+    batteryData: batteryData
+  };
+
 }
 
 function isAllowed(req) {
