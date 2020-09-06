@@ -28,7 +28,7 @@ const datastore = process.env.K_SERVICE ?
     keyFilename: config.gcp.keyFilename
   });
 
-const moment = require('moment');
+const moment = require('moment-timezone');
 const Base64 = require('js-base64').Base64;
 
 exports.ifDataGet = (req, res) => {
@@ -199,7 +199,7 @@ function formResponse(data) {
   var outData = new Array();
   var labels = new Array();
   data.forEach((element) => {
-    var date = moment(element.date).format('LLL');
+    var date = moment(element.date).tz('Europe/Helsinki').format('LLL');
     inData.push({
       x: date,
       y: element.in
@@ -220,7 +220,7 @@ function formTagResponse(data) {
   var batteryData = new Array();
   var labels = new Array();
   data.forEach((element) => {
-    var date = moment(element.fDate).format('LLL');
+    var date = moment(element.fDate).tz('Europe/Helsinki').format('LLL');
     tempData.push({
       x: date,
       y: element.temperature
@@ -255,7 +255,7 @@ function formReducedTagResponse(data) {
   var batteryData = new Array();
   var labels = new Array();
   data.forEach((element) => {
-    var date = moment(element.fDate).format('LLL');
+    var date = moment(element.fDate).tz('Europe/Helsinki').format('LLL');
     tempData.push({
       x: date,
       y: element.temperatureAvg
