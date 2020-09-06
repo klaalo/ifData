@@ -5,7 +5,8 @@
     "summariserHours": 2,
     "summariserDayDays": 15,
     "getLimit": 1440,
-    "getDaysLimit" : 30
+    "getDaysLimit" : 30,
+    "timeZone" : "Europe/Helsinki"
   },
   "snmp": {
     "host": "192.168.2.1",

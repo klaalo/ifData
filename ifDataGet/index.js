@@ -199,7 +199,8 @@ function formResponse(data) {
   var outData = new Array();
   var labels = new Array();
   data.forEach((element) => {
-    var date = moment(element.date).tz('Europe/Helsinki').format('LLL');
+    var date = moment(element.date)
+      .tz(config.general.timeZone).format('LLL');
     inData.push({
       x: date,
       y: element.in
@@ -220,7 +221,8 @@ function formTagResponse(data) {
   var batteryData = new Array();
   var labels = new Array();
   data.forEach((element) => {
-    var date = moment(element.fDate).tz('Europe/Helsinki').format('LLL');
+    var date = moment(element.fDate)
+      .tz(config.general.timeZone).format('LLL');
     tempData.push({
       x: date,
       y: element.temperature
@@ -255,7 +257,8 @@ function formReducedTagResponse(data) {
   var batteryData = new Array();
   var labels = new Array();
   data.forEach((element) => {
-    var date = moment(element.fDate).tz('Europe/Helsinki').format('LLL');
+    var date = moment(element.fDate)
+      .tz(config.general.timeZone).format('LLL');
     tempData.push({
       x: date,
       y: element.temperatureAvg
