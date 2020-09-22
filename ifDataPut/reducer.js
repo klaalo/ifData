@@ -2,7 +2,9 @@ const config = require('../config.json');
 
 const moment = require('moment');
 
-const {Datastore} = require('@google-cloud/datastore');
+const {
+  Datastore
+} = require('@google-cloud/datastore');
 const datastore = new Datastore({
   projectId: config.gcp.projectId,
   keyFilename: config.gcp.keyFilename
@@ -11,16 +13,18 @@ const datastore = new Datastore({
 exports.run = () => {
   getFirst()
     .then((entity) => {
-	var tMoment = moment(entity.fDate);
+      var tMoment = moment(entity.fDate);
       if (tMoment.isBefore(moment().subtract(config.general.summariserDayDays, 'days'))) {
         reduceDay(tMoment, entity);
       } else {
-	  if (config.general.debug) {
-	      console.log({debug : 'not enough days for reducer',
-		tMoment: tMoment.toDate(),
-		deltaDay: moment().subtract(config.general.summariserDayDays, 'days').toDate(),
-		summariserDayDays: config.general.summariserDayDays});
-          }
+        if (config.general.debug) {
+          console.log({
+            debug: 'not enough days for reducer',
+            tMoment: tMoment.toDate(),
+            deltaDay: moment().subtract(config.general.summariserDayDays, 'days').toDate(),
+            summariserDayDays: config.general.summariserDayDays
+          });
+        }
       }
     });
 }
@@ -32,7 +36,7 @@ function reduceDay(tMoment, entity) {
       var sumHum = 0;
       var sumPress = 0;
       var count = 0;
-	
+
       entities.forEach((element) => {
         sumTemp += element.temperature;
         sumHum += element.humidity;
@@ -44,14 +48,14 @@ function reduceDay(tMoment, entity) {
         temperatureAvg: sumTemp / count,
         humidityAvg: sumHum / count,
         pressureAvg: sumPress / count,
-	fDate: tMoment.endOf('day').format(),
-	tagId: entity.tagId  
+        fDate: tMoment.endOf('day').format(),
+        tagId: entity.tagId
       };
       console.log(reduced);
-	saveReduced(reduced)
-            .then((createdKeys) => {
-		deleteEntities(getKeys(entities));
-            });
+      saveReduced(reduced)
+        .then((createdKeys) => {
+          deleteEntities(getKeys(entities));
+        });
     });
 }
 
@@ -60,7 +64,7 @@ function deleteEntities(keys) {
     deleteKeys(keys);
   } else {
     while (keys.length > 500) {
-      var myKeys = keys.splice(0,500);
+      var myKeys = keys.splice(0, 500);
       deleteKeys(myKeys);
     }
     deleteKeys(keys);
@@ -70,11 +74,15 @@ function deleteEntities(keys) {
 
 function deleteKeys(keys) {
   datastore.delete((keys), (err) => {
-      if (err) {
-          console.log({ 'datastore error' : err});
-      } else {
-          console.log({ 'Deleted entities count' : keys.length });
-      }
+    if (err) {
+      console.log({
+        'datastore error': err
+      });
+    } else {
+      console.log({
+        'Deleted entities count': keys.length
+      });
+    }
   });
 
 }
@@ -94,19 +102,21 @@ function saveReduced(reduced) {
     data: reduced
   };
   return new Promise((resolve, reject) => {
-      datastore.save(entity, (err, apiResponse) => {
-	  if (err) {
-              console.log({ 'Datastore error' : err});
-	      reject(err);
-	  }
-	  console.log({
-              date: new(Date),
-              status: 'saved to datastore',
-              key: apiResponse.mutationResults[0].key.path[0].id,
-	      kind: apiResponse.mutationResults[0].key.path[0].kind
-	  });
-	  resolve(apiResponse.mutationResults[0].key.path[0].kind);
+    datastore.save(entity, (err, apiResponse) => {
+      if (err) {
+        console.log({
+          'Datastore error': err
+        });
+        reject(err);
+      }
+      console.log({
+        date: new(Date),
+        status: 'saved to datastore',
+        key: apiResponse.mutationResults[0].key.path[0].id,
+        kind: apiResponse.mutationResults[0].key.path[0].kind
       });
+      resolve(apiResponse.mutationResults[0].key.path[0].kind);
+    });
   });
 }
 
@@ -142,5 +152,5 @@ function getFirst() {
           resolve(entities[0]);
         }
       });
-    });
+  });
 }
