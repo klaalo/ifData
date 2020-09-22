@@ -13,16 +13,23 @@ const dateFormat = "YYYY-MM-DD HH:mm:ssZ";
 
 exports.run = () => {
   getFirst()
-    .then((entity) => {
+	.then((entity) => {
       var tMoment = moment(entity.date);
       if (tMoment.isBefore(moment().subtract(config.general.summariserDayDays, 'days'))) {
         summariseDay(tMoment, entity);
+      } else {
+	  if (config.general.debug) {
+	      console.log({debug : 'not enough days for summariser',
+		tMoment: tMoment.toDate(),
+		deltaDay: moment().subtract(config.general.summariserDayDays, 'days').toDate(),
+		summariserDayDays: config.general.summariserDayDays});
+          }
       }
     });
 }
 
 function summariseDay(tMoment, entity) {
-  getDay(tMoment)
+    getDay(tMoment)
     .then((entities) => {
       var countedData = countData.countData(entities);
       var summarised = {
@@ -37,7 +44,8 @@ function summariseDay(tMoment, entity) {
       });
       summarised.date = tMoment.format();
       summarised.ifDescr = entity.ifDescr;
-      console.log(summarised);
+      summarised.ifId = entity.ifId;
+	
       saveDaySummary(summarised)
         .then((createdKeys) => {
           if (countedData.keys.length < 500) {
@@ -78,7 +86,8 @@ function saveDaySummary(summarised) {
           console.log({
             date: new(Date),
             status: [config.gcp.sumDayKind] + ' saved to datastore',
-            key: key.path[1]});
+              key: key.path[1],
+	      summarised: summarised});
           resolve(keys);
         }
     });

@@ -14,11 +14,18 @@ exports.run = () => {
 	var tMoment = moment(entity.fDate);
       if (tMoment.isBefore(moment().subtract(config.general.summariserDayDays, 'days'))) {
         reduceDay(tMoment, entity);
+      } else {
+	  if (config.general.debug) {
+	      console.log({debug : 'not enough days for reducer',
+		tMoment: tMoment.toDate(),
+		deltaDay: moment().subtract(config.general.summariserDayDays, 'days').toDate(),
+		summariserDayDays: config.general.summariserDayDays});
+          }
       }
     });
 }
 
-function reduceDay(tMoment) {
+function reduceDay(tMoment, entity) {
   getDay(tMoment)
     .then((entities) => {
       var sumTemp = 0;
@@ -37,7 +44,8 @@ function reduceDay(tMoment) {
         temperatureAvg: sumTemp / count,
         humidityAvg: sumHum / count,
         pressureAvg: sumPress / count,
-	fDate: tMoment.endOf('day').format()  
+	fDate: tMoment.endOf('day').format(),
+	tagId: entity.tagId  
       };
       console.log(reduced);
 	saveReduced(reduced)

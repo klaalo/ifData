@@ -50,6 +50,7 @@ exports.get = (ifIdx, host, community) => {
             }
           }
           session.close ();
+	  retData.ifId = config.snmp.ifId + "-" + retData.ifDescr
           resolve(retData);
       }
     });

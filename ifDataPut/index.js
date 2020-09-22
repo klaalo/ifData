@@ -46,7 +46,7 @@ function dataSaveHandler(err, apiResponse) {
       }
       console.log({
         date: new(Date),
-        status: 'saved to datastore',
+        info: 'saved to datastore',
         key: apiResponse.mutationResults[0].key.path[0].id,
 	kind: apiResponse.mutationResults[0].key.path[0].kind
       });

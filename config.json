@@ -3,10 +3,11 @@
     "storeGcp": true,
     "intervalMin": 5,
     "summariserHours": 2,
-    "summariserDayDays": 15,
+    "summariserDayDays": 10,
     "getLimit": 1440,
     "getDaysLimit" : 30,
-    "timeZone" : "Europe/Helsinki"
+    "timeZone" : "Europe/Helsinki",
+    "debug" : true
   },
   "snmp": {
     "host": "192.168.2.1",
@@ -15,7 +16,8 @@
     "ifInOctets": "1.3.6.1.2.1.2.2.1.10",
     "ifOutOctets": "1.3.6.1.2.1.2.2.1.16",
     "ifDescr": "1.3.6.1.2.1.2.2.1.2",
-    "hrSystemDate" :"1.3.6.1.2.1.25.1.2.0"
+    "hrSystemDate" :"1.3.6.1.2.1.25.1.2.0",
+    "ifId" : "ifid12"   
   },
   "gcp": {
     "projectId": "project-1234",
