@@ -43,7 +43,7 @@ exports.countData = (entities) => {
     });
   }
   keys.push(entities[0][Object.getOwnPropertySymbols(first)[0]]);
-  return {data: data, keys: keys };
+  return { data, keys };
 }
 
 exports.divided = (entities) => {
