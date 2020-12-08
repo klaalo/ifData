@@ -3,7 +3,7 @@
     "storeGcp": true,
     "intervalMin": 5,
     "summariserHours": 2,
-    "summariserDayDays": 10,
+    "summariserDayDays": 5,
     "getLimit": 1440,
     "getDaysLimit" : 30,
     "timeZone" : "Europe/Helsinki",
