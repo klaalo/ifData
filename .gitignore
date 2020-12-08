@@ -6,6 +6,11 @@ keyfile.json
 index.yaml
 openapi-functions.yaml
 ifDataGet/config.json
+
+# ignore linked files
+reducer/config.json
+reducer/countData.js
+
 ifDataPut.log
 *~
 muistio.txt

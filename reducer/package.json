@@ -1,0 +1,7 @@
+{
+	"dependencies": {
+		"@google-cloud/datastore": "6.2.0",
+		"moment": "2.29.1",
+		"moment-timezone": "0.5.31"
+	}
+}
