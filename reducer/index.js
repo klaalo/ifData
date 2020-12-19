@@ -12,10 +12,18 @@ const config = require('./config.json');
 const summariser = require('./summariser.js');
 const reducer = require('./reducer.js');
 
+//const kindIterator = require('./kindIterator.js');
+
 
 
 exports.reducer = (message, ctx, callback) => {
   console.log("running reducer function with message: " + message.data);
+  runReducers(callback);
+  //kindIterator.iterate(config.temp.reducedDayKind);
+
+}
+
+function runReducers(callback) {
   console.log("entering summariser");
   summariser.run()
     .then((data) => {
