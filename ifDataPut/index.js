@@ -23,10 +23,6 @@ var lastRuuviUpdate;
 
 get();
 setInterval(get, config.general.intervalMin * 60000);
-summariser.run();
-setInterval(summariser.run, config.general.summariserHours * 3600 * 1000);
-reducer.run();
-setInterval(reducer.run, config.general.summariserHours * 3600 * 1000);
 
 function get() {
   if (sigterm) {
