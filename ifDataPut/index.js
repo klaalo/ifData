@@ -13,9 +13,6 @@ const datastore = new Datastore({
   keyFilename: config.gcp.keyFilename
 });
 
-const summariser = require('./summariser.js');
-const reducer = require('./reducer.js');
-
 var sigterm = false;
 var lastRun = new Date(0);
 
