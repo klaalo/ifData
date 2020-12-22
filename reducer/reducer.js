@@ -22,9 +22,46 @@ const datastore = process.env.K_SERVICE ?
 
 exports.run = () => {
 
+  let query = datastore.createQuery(config.temp.kind);
+  return query
+    .select('tagId')
+    .groupBy('tagId')
+    .run()
+      .then((data) => {
+        if (data[0].length > 0) {
+          let reducePromises = new Array();
+          data[0]
+            .forEach((entity) => {
+              reducePromises.push(reduceFlow(entity.tagId));
+            });
+          return Promise.all(reducePromises)
+            .then((promArray) => {
+              console.log({
+                status: "ok",
+                reason: "run " +
+                  promArray.length + " tag reducers"
+              });
+            });
+        } else {
+            return Promise.reject({
+              status: 'error',
+              reason: 'no entities with tagId in Datastore'
+            });
+        }
+      })
+
+}
+
+function reduceFlow(tagId) {
   var reducedKeys;
   var reduced;
-  return getFirst()
+
+  console.log({
+    status: "ok",
+    reason: "reducing tag",
+    tagId: tagId
+  });
+  return getFirst(tagId)
     .then((entity) => {
       var tMoment = moment(entity.fDate);
       if (tMoment.isBefore(moment().subtract(config.general.summariserDayDays, 'days'))) {
@@ -41,7 +78,7 @@ exports.run = () => {
       }
     })
   .then((entity) => {
-    return getDay(moment(entity.fDate));
+    return getDay(entity.tagId, moment(entity.fDate));
     })
   .then((entities) => {
     if (entities[0].length < 1) {
@@ -70,7 +107,11 @@ exports.run = () => {
       delPromises.push(
         datastore.delete(keys)
           .then(() => {
-            console.log("Deleted entities count: " + keys.length);
+            console.log({
+              status: "ok",
+              reason: "Deleted entities count: " + keys.length,
+              tagid: tagId
+            });
             return keys.length;
           })
       );
@@ -78,7 +119,11 @@ exports.run = () => {
     delPromises.push(
       datastore.delete(reducedKeys)
         .then(() => {
-          console.log("Deleted entities count: " + reducedKeys.length);
+          console.log({
+            status: "ok",
+            reason: "Deleted entities count: " + reducedKeys.length,
+            tagid: tagId
+          });
           return reducedKeys.length;
         })
     );
@@ -138,25 +183,29 @@ function saveReduced(reduced) {
   return datastore.save(entity);
 }
 
-function getDay(getMoment) {
+function getDay(tagId, getMoment) {
     let query = datastore.createQuery(config.temp.kind);
     if (config.general.debug) {
-      console.log("getting day: " +
-        getMoment.tz(config.general.timeZone).startOf('day').toISOString(true));
+      console.log({
+          status: "ok",
+          level: "debug",
+          reason: "getting day",
+          date: getMoment.tz(config.general.timeZone).startOf('day').toISOString(true),
+          tagId: tagId
+      });
     }
     return query
+      .filter('tagId', '=', tagId)
       .filter('fDate', '>', getMoment.tz(config.general.timeZone).startOf('day').toISOString(true))
       .filter('fDate', '<', getMoment.tz(config.general.timeZone).endOf('day').toISOString(true))
-      .order('fDate', {
-        descending: true
-      })
       .run();
 }
 
-function getFirst() {
+function getFirst(tagId) {
   return new Promise((resolve, reject) => {
     let query = datastore.createQuery(config.temp.kind);
     query
+      .filter('tagId', '=', tagId)
       .order('fDate')
       .limit(1)
       .run((err, entities) => {
