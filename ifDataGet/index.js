@@ -72,6 +72,14 @@ exports.ifDataGet = (req, res) => {
       break;
     case 'GET':
 
+      if (process.env.K_SERVICE && !isAllowed(req)) {
+        res.status(401).send({
+          error: "not allowed",
+          cause: "you are not allowed to access this content"
+        });
+        return;
+      }
+
       if (req.query.dataType &&
         req.query.dataType == "tagSingle") {
 
