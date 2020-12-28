@@ -74,7 +74,17 @@ exports.ifDataGet = (req, res) => {
 
       if (req.query.dataType &&
         req.query.dataType == "tagSingle") {
-          getTagdata(1)
+
+          if (!req.query.tagId) {
+            res.status(400).send({
+              error: 'missing data',
+              cause: 'tagId parameter missing'
+            })
+            return;
+          }
+
+          getTagdata(1, config.temp.kind,
+            req.query.tagId)
             .then((data) => {
               res.send(data[0]);
             })
@@ -83,7 +93,17 @@ exports.ifDataGet = (req, res) => {
             });
       } else if (req.query.dataType &&
         req.query.dataType == "tagMultiple") {
-          getTagdata(config.temp.getLimit, req.query.gran)
+
+          if (!req.query.tagId) {
+            res.status(400).send({
+              error: 'missing data',
+              cause: 'tagId parameter missing'
+            })
+            return;
+          }
+
+          getTagdata(config.temp.getLimit, req.query.gran,
+            req.query.tagId)
             .then((data) => {
               if (req.query.out &&
                 req.query.out == 'chart') {
@@ -120,8 +140,7 @@ exports.ifDataGet = (req, res) => {
 
 };
 
-
-function getTagdata(limit, gran) {
+function getTagdata(limit, gran, tagId) {
 
   var myGran = "";
   switch (gran) {
@@ -144,13 +163,16 @@ function getTagdata(limit, gran) {
 
     let query = datastore.createQuery(myGran);
     query
+      .filter('tagId', '=', tagId)
       .order('fDate', {
         descending: true
       })
       .limit(myLimit)
       .run((err, entities) => {
         if (err) {
-          console.log({ error: 'datastore error'});
+          console.log({ error: 'datastore error',
+            status: 'error',
+            err: err});
           reject('datastore error');
         }
         resolve(entities);
