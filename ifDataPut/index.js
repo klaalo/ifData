@@ -16,7 +16,7 @@ const datastore = new Datastore({
 var sigterm = false;
 var lastRun = new Date(0);
 
-var lastRuuviUpdate;
+var lastRuuviUpdate = new Map();
 
 get();
 setInterval(get, config.general.intervalMin * 60000);
@@ -87,7 +87,7 @@ function saveTagdata(data) {
   console.log(data);
   datastore.save(entity, dataSaveHandler);
 
-  lastRuuviUpdate = moment();
+    lastRuuviUpdate.set(data.tagId, moment());
 }
 
 socket.on('connect_error', (error) => {
@@ -101,14 +101,14 @@ socket.on('disconnect', (reason) => {
 });
 
 socket.on('updated', (data) => {
-  if (lastRuuviUpdate &&
-    lastRuuviUpdate instanceof moment &&
-    lastRuuviUpdate.isBefore(
-      moment().subtract(config.temp.sampleIntervalMin, 'minutes'))) {
+    if (lastRuuviUpdate.has(data.tagId) &&
+	lastRuuviUpdate.get(data.tagId) instanceof moment &&
+	lastRuuviUpdate.get(data.tagId).isBefore(
+	    moment().subtract(config.temp.sampleIntervalMin, 'minutes'))) {
 
     saveTagdata(data);
 
-  } else if (!lastRuuviUpdate) {
-    saveTagdata(data);
-  }
+    } else if (!lastRuuviUpdate.has(data.tagId)) {
+	saveTagdata(data);
+    }
 });
