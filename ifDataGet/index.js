@@ -15,7 +15,7 @@ const countData = require('./countData.js');
 
 const {Datastore} = require('@google-cloud/datastore');
 
-/*  Use GCP Node.js 10 environment variable to
+/*  Use GCP environment variable to
     check if function is run locally or
     in the cloud. Datastore initialisation requires
     keyfile if run outside GCP environment.
@@ -31,39 +31,20 @@ const datastore = process.env.K_SERVICE ?
 const moment = require('moment-timezone');
 const Base64 = require('js-base64').Base64;
 
-exports.ifDataGet = (req, res) => {
-
-  /*  Disable authentication if run locally.
-      Also, send cors headers if run locally. In
+function checkLocal(res) {
+  /*  Send cors headers if run locally. In
       cloud environment ESP is used to provide cors
       headers.
   */
-  if (process.env.K_SERVICE) {
-    if (!isAllowed(req)) {
-      res.status(401).send('Unathorised.');
-      return;
-    }
-  } else {
+  if (!process.env.K_SERVICE) {
     res.set('Access-Control-Allow-Origin', 'http://localhost:8080');
     res.set('Access-Control-Allow-Methods', 'GET');
     res.set('Access-Control-Allow-Headers', 'Authorization');
   }
+}
 
-  if (req.query.amiallowed) {
-    if (!process.env.K_SERVICE ||
-      (req.method == 'GET' &&
-          isAllowed(req))) {
-        res.send('true');
-        return;
-    }  else {
-        res.status(401).send('Unauthorised user.');
-        return;
-    }
-  } else if (!(req.query.gran
-    || req.query.dataType)) {
-      res.status(400).send('Bad request');
-      return;
-  }
+exports.ifDataGet = (req, res) => {
+  checkLocal(res);
 
   switch (req.method) {
     case 'OPTIONS':
@@ -72,23 +53,39 @@ exports.ifDataGet = (req, res) => {
       break;
     case 'GET':
 
-      if (process.env.K_SERVICE && !isAllowed(req)) {
-        res.status(401).send({
-          error: "not allowed",
-          cause: "you are not allowed to access this content"
-        });
-        return;
+      /*  Require authentication header.
+          Assumption is made that validationing of the authorisation
+          header is done on API-GW level. Locally jwt is accepted
+          without any validations or verifications.
+      */
+      if (!req.get('Authorization') &&
+        !req.get('X-Endpoint-API-UserInfo')) {
+          return res.status(401)
+            .send("Authentication required");
       }
 
-      if (req.query.dataType &&
-        req.query.dataType == "tagSingle") {
+      if (req.path == "/mySensors") {
+        return res.send(getMySensors(req));
+      }
+
+      if (req.path == "/userSelf") {
+        return res.send(getClaims(req));
+      }
+
+      if (req.path == "/sensorSingle") {
 
           if (!req.query.tagId) {
-            res.status(400).send({
+            return res.status(400).send({
               error: 'missing data',
               cause: 'tagId parameter missing'
-            })
-            return;
+            });
+          }
+
+          if (!isOwner(req, req.query.tagId)) {
+            return res.status(403).send({
+              error: 'not allowed',
+              cause: 'you are not allowed to access this data'
+            });
           }
 
           getTagdata(1, config.temp.kind,
@@ -99,8 +96,10 @@ exports.ifDataGet = (req, res) => {
             .catch((responseStr) => {
               res.status(500).send(responseStr);
             });
-      } else if (req.query.dataType &&
-        req.query.dataType == "tagMultiple") {
+            return;
+      }
+
+      if (req.path == "/sensorData") {
 
           if (!req.query.tagId) {
             res.status(400).send({
@@ -108,6 +107,13 @@ exports.ifDataGet = (req, res) => {
               cause: 'tagId parameter missing'
             })
             return;
+          }
+
+          if (!isOwner(req, req.query.tagId)) {
+            return res.status(403).send({
+              error: 'not allowed',
+              cause: 'you are not allowed to access this data'
+            });
           }
 
           getTagdata(config.temp.getLimit, req.query.gran,
@@ -127,7 +133,18 @@ exports.ifDataGet = (req, res) => {
             .catch((responseStr) => {
               res.status(500).send(responseStr);
             });
-      } else {
+            return;
+      }
+
+      if (req.path == "/ifData") {
+
+        if (!isAdmin(getUser(req))) {
+          return res.status(403).send({
+            error: 'not allowed',
+            cause: 'you are not allowed to access this data'
+          });
+        }
+
         get(req.query.gran)
           .then((data) => {
             if (req.query.out &&
@@ -140,7 +157,10 @@ exports.ifDataGet = (req, res) => {
           .catch((responseStr) => {
             res.send(responseStr);
           });
+          return;
       }
+      console.log("nothing at path: " + req.path);
+      res.status(400).send("Nothing to do at path: " + req.path);
       break;
     default:
       res.status(400).send('Method not supported');
@@ -313,9 +333,54 @@ function formReducedTagResponse(data) {
 
 }
 
-function isAllowed(req) {
-  if (req.query.dataType && req.query.dataType == 'tagSingle') return true;
-  if (!req.get('X-Endpoint-API-UserInfo')) return false;
-  var jwt = JSON.parse(Base64.decode(req.get('X-Endpoint-API-UserInfo')));
-  return jwt.sub == process.env.A_USER ? true : false;
+function getUser(req) {
+  return getClaims(req).sub;
+}
+
+function getClaims(req) {
+  var jwt;
+  if (!process.env.K_SERVICE) {
+    let jwtStr = /Bearer [\w-_]*\.(\w*)\.[\w-_]*/.exec(req.get('Authorization'))[1];
+    jwt = JSON.parse(Base64.decode(jwtStr));
+  } else {
+    jwt = JSON.parse(Base64.decode(req.get('X-Endpoint-API-UserInfo')));
+  }
+  if (isAdmin(jwt.sub)) {
+    jwt['isAdmin'] = true;
+  }
+  return jwt;
+}
+
+function isAdmin(userId) {
+  return userId == process.env.A_USER ? true : false;
+}
+
+function isOwner(req, tagId) {
+  let user = getUser(req);
+  return getMySensors(req).find(item => {
+    if (item.tagId == tagId &&
+        item.owner == user) {
+          return true;
+        }
+    });
+}
+
+function getMySensors(req) {
+  if (isAdmin(getUser(req))) {
+    return [
+      {
+        tagId: 'abababababab9a',
+        tagName: 'Tag 1',
+        owner: process.env.A_USER
+      },
+      {
+        tagId: 'ababababababbd',
+        tagName: 'Tag 2',
+        owner: process.env.A_USER
+      }
+    ];
+  } else {
+    return [];
+  }
+
 }
