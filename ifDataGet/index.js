@@ -1,6 +1,6 @@
 /*
 
-  Node.js 10 function to serve iot metrics for
+  Node.js 12 function to serve iot metrics for
   visualisation on a web page.
 
   Function gets the metrics from Google Datastore
