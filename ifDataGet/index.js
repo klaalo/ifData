@@ -371,11 +371,19 @@ function getMySensors(req) {
       {
         tagId: 'abababababab9a',
         tagName: 'Tag 1',
+        sensorType: 'Ruuvitag',
         owner: process.env.A_USER
       },
       {
         tagId: 'ababababababbd',
         tagName: 'Tag 2',
+        sensorType: 'Ruuvitag',
+        owner: process.env.A_USER
+      },
+      {
+        tagId: 'abc1-eth1',
+        tagName: 'abc1-eth1',
+        sensorType: 'IfCounter',
         owner: process.env.A_USER
       }
     ];
