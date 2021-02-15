@@ -7,6 +7,6 @@
 		"moment-timezone": "0.5.31"
 	},
 	"scripts": {
-		"start": "functions-framework --target=ifDataGet --port=8081"
+		"start": "A_USER=google-user-id functions-framework --target=ifDataGet --port=8081"
 	}
 }
